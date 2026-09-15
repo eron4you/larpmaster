@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>eron4u</title>
+<meta name="description" content="eron4u's website.">
+<meta name="keywords" content="eron4u, eronforyou, eron4you, efe, efeforyou">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+  body, html { 
+    margin:0; 
+    padding: 0; 
+    width: 100%; 
+    height: 100%; 
+    overflow:hidden; 
+    background-color: #000; 
+    font-family: 'Poppins', sans-serif; 
+  }
+
+  /* --- YÜKLEME EKRANI (LOADING SCREEN) TASARIMI --- */
+  #loader-wrapper {
+    position: fixed;
+    inset: 0;
+    background-color: #000;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+
+  .spinner {
+    width: 45px;
+    height: 45px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 15px;
+  }
+
+  .loader-text {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Başlangıçta gizli, sadece Animations yazan buton */
+  .bass-toggle {
+    display: none;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: rgba(20, 20, 20, 0.5);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 10px 16px;
+    border-radius: 12px;
+    z-index: 999;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    backdrop-filter: blur(10px);
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  .bass-toggle:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+  }
+
+  #pop_wa {
+    position: fixed; z-index: 999;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    display: none; width: 440px;
+    background: rgba(20, 20, 20, 0.6);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 24px;
+    padding: 30px 0; text-align: center;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 20px 70px rgba(0,0,0,0.8);
+  }
+
+  #pop_wa h2 { 
+    margin: 0 0 15px 0; color: #fff; 
+    font-size: 15px; font-weight: 400; letter-spacing: 0.5px; opacity: 0.9;
+  }
+  
+  .sep { height: 1px; width: 70%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); margin: 0 auto 25px auto; }
+  
+  .f-row { display: flex; justify-content: center; gap: 40px; align-items: center; }
+  
+  .f-img { 
+    width: 100px; height: 65px;
+    border-radius: 12px; border: 2px solid rgba(255,255,255,0.1); 
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    object-fit: cover;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    cursor: pointer;
+  }
+  .f-img:hover { transform: scale(1.1); border-color: #fff; box-shadow: 0 8px 25px rgba(255,255,255,0.15); }
+
+  #bg_blur { 
+    display: none; position: fixed; inset: 0; 
+    background: rgba(0,0,0,0.5); 
+    backdrop-filter: blur(6px); z-index: 990; 
+  }
+
+  .sp-box { display: flex; flex-direction: column; justify-content: center; text-align: left; line-height: 1.2; }
+  .tr-name { font-weight: 500; font-size: 14px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+  .ar-name { font-size: 12px; color: rgba(255,255,255,0.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .icon { 
+    background: transparent !important; 
+    box-shadow: none !important; 
+    font-size: 26px !important; 
+    color: rgba(255, 255, 255, 0.9);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.2s, text-shadow 0.2s !important;
+    cursor: pointer;
+  }
+  
+  .icon:hover { transform: translateY(-4px) scale(1.3) !important; }
+
+  .icon.discord:hover { color: #5865F2; text-shadow: 0 0 18px rgba(88,101,242,0.8); }
+  .icon.spotify:hover { color: #1DB954; text-shadow: 0 0 18px rgba(29,185,84,0.8); }
+  .icon.instagram:hover { color: #C13584; text-shadow: 0 0 18px rgba(193,53,132,0.8); }
+  .icon.twitter:hover { color: #fff; text-shadow: 0 0 18px rgba(255,255,255,0.9); } 
+  .icon.tiktok:hover { color: #6e5494; text-shadow: 0 0 18px rgba(110,84,148,0.8); }
+  .icon.github:hover { color: #a9a9a9; text-shadow: 0 0 18px rgba(169,169,169,0.8); }
+  .icon.whatsapp:hover { color: #25D366; text-shadow: 0 0 18px rgba(37,211,102,0.8); }
+
+  .wrap { perspective: 1200px; }
+
+  .card { 
+    margin: 0 auto !important; 
+    padding: 40px 60px !important; 
+    width: fit-content;
+    transform-style: preserve-3d; 
+    will-change: transform;
+  }
+  
+  .avatar {
+    width: 125px !important; 
+    height: 125px !important;
+  }
+
+  .nick { 
+    margin-bottom: 5px !important; 
+    font-weight: 600 !important; 
+    font-size: 38px !important; 
+  }
+
+  .icon {
+    width: 55px !important; 
+    height: 55px !important;
+    font-size: 32px !important; 
+  }
+
+  .presence { 
+    position: fixed !important;
+    bottom: 75px !important; 
+    left: 50% !important;
+    transform: translateX(-50%) !important; 
+    margin: 0 !important;
+    width: 336px !important; 
+    background: rgba(20, 20, 20, 0.5) !important; 
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 17px !important; 
+    padding: 12px 17px !important; 
+    display: flex !important;
+    align-items: center !important;
+    gap: 17px !important; 
+    backdrop-filter: blur(15px) !important;
+    box-shadow: 0 12px 60px rgba(0,0,0,.5) !important;
+  }
+  
+  .presence::before {
+    content: "Discord";
+    position: absolute;
+    top: -20px; 
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 2px;
+    text-transform: uppercase; 
+    pointer-events: none; 
+  }
+
+  .p-avatar { width: 55px !important; height: 55px !important; border-radius: 12px !important; }
+  .status-dot { width: 12px !important; height: 12px !important; right: 12px !important; top: 12px !important; border-width: 3px !important; }
+  .p-text { flex: 1; overflow: hidden; }
+  #txt1 { font-size: 18px !important; margin-bottom: 2px !important; }
+  .tr-name { font-size: 18px !important; font-weight: 600 !important; margin-bottom: 2px !important; }
+  .ar-name { font-size: 15px !important; }
+  #txt1 i { font-size: 19px !important; margin-right: 7px !important; }
+
+</style>
+</head>
+<body>
+
+  <!-- Yükleme Ekranı Div'i -->
+  <div id="loader-wrapper">
+    <div class="spinner"></div>
+    <div class="loader-text">Loading Assets...</div>
+  </div>
+
+  <button id="btn_bass" class="bass-toggle">Animations</button>
+
+  <div id="ent_ov" class="overlay"><h1>click here</h1></div>
+  
+  <video id="v1" class="bg-video" src="assets/bg.mp4" preload="auto" loop playsinline crossorigin="anonymous"></video>
+  <div class="bg-dim"></div>
+
+  <main class="wrap" data-discord-id="1241297206489649233">
+    <section class="card" id="main_c">
+      <img id="p_img" class="avatar" src="assets/profile.png" alt="profile">
+      <h1 class="nick">eron4u</h1>
+      <nav class="icons">
+        <button class="icon btn-copy discord" id="cp_disc"><i class="fa-brands fa-discord"></i></button>
+        <a class="icon spotify" href="https://open.spotify.com/user/31fv7xymukml7tnf6kuwyokbd5la" target="_blank"><i class="fa-brands fa-spotify"></i></a>
+        <a class="icon instagram" href="https://www.instagram.com/eron4u/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+        <a class="icon twitter" href="https://x.com/eronforyou" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+        <a class="icon tiktok" href="https://www.tiktok.com/@efeforyou" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
+        <a class="icon github" href="https://github.com/eronforyou" target="_blank"><i class="fa-brands fa-github"></i></a>
+        <button id="btn_wa" class="icon whatsapp"><i class="fa-brands fa-whatsapp"></i></button>
+      </nav>
+    </section>
+
+    <div class="presence" id="stat_box">
+      <img id="stat_img" class="p-avatar" src="assets/profile.png" alt="">
+      <div class="p-text">
+        <div id="txt1">Loading...</div>
+        <div id="txt2"></div>
+      </div>
+      <span class="status-dot" id="dot"></span>
+    </div>
+  </main>
+
+  <div id="notif" class="toast">Copied!</div>
+
+  <div id="pop_wa">
+    <h2>Which number would you like to copy?</h2>
+    <div class="sep"></div>
+    <div class="f-row">
+      <img id="f_tr" class="f-img" src="https://flagcdn.com/tr.svg" alt="TR">
+      <img id="f_uk" class="f-img" src="https://flagcdn.com/gb.svg" alt="GB">
+    </div>
+  </div>
+  <div id="bg_blur"></div>
+
+  <div id="audio_ui" class="volume-control">
+    <i class="fa-solid fa-volume-high"></i>
+    <input type="range" id="vol_in" min="0" max="1" step="0.01" value="1">
+  </div>
+
+  <script>
+    var vid = document.getElementById('v1');
+    var loader = document.getElementById('loader-wrapper');
+
+    function hideLoader() {
+        if(loader) {
+            loader.style.opacity = '0';
+            loader.style.visibility = 'hidden';
+            setTimeout(function() {
+                if(loader.parentNode) loader.parentNode.removeChild(loader);
+            }, 500);
+        }
+    }
+
+    if (vid) {
+        if (vid.readyState >= 3) {
+            hideLoader();
+        } else {
+            vid.addEventListener('canplaythrough', hideLoader);
+            setTimeout(hideLoader, 5000);
+        }
+    } else {
+        hideLoader();
+    }
+
+    var bassEnabled = true;
+    var btnBass = document.getElementById('btn_bass');
+    
+    if(btnBass) {
+        btnBass.onclick = function() {
+            bassEnabled = !bassEnabled; 
+        };
+    }
+
+    var ov = document.getElementById('ent_ov');
+    var aBox = document.getElementById('audio_ui');
+    var slider = document.getElementById('vol_in');
+    var audioCtx, analyser, dataArray;
+    
+    if(aBox) aBox.style.display = 'none';
+
+    ov.onclick = function() {
+        var btnBass = document.getElementById('btn_bass');
+        if(btnBass) btnBass.style.display = 'block';
+
+        var self = this;
+        self.style.transition = 'opacity .4s ease';
+        self.style.opacity = '0';
+        self.style.pointerEvents = 'none';
+        
+        setTimeout(function(){ 
+            if(self.parentNode) self.parentNode.removeChild(self); 
+        }, 400);
+
+        if(aBox) aBox.style.display = 'flex';
+        
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            var source = audioCtx.createMediaElementSource(vid);
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 256; 
+            source.connect(analyser);
+            analyser.connect(audioCtx.destination);
+            dataArray = new Uint8Array(analyser.frequencyBinCount);
+        }
+        
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        
+        if(vid) {
+            vid.muted = false;
+            vid.currentTime = 0;
+            vid.volume = 1;
+            vid.play();
+        }
+    };
+
+    if(slider && vid) {
+        slider.oninput = function() {
+            vid.volume = this.value;
+            vid.muted = false;
+        };
+    }
+
+    var cEl = document.getElementById('main_c');
+    var cx = 0, cy = 0, tx = 0, ty = 0;
+
+	function renderLoop() {
+        cx += (tx - cx) * 0.15;
+        cy += (ty - cy) * 0.15;
+        
+        var scale = 1;
+        var offsetX = 0;
+        var offsetY = 0;
+
+        if (analyser && !vid.paused && bassEnabled) {
+            analyser.getByteFrequencyData(dataArray);
+            
+            // Sub-bass ve kick frekansları (ilk 2 band)
+            var bassSum = 0;
+            for(var i = 0; i < 2; i++) {
+                bassSum += dataArray[i];
+            }
+            var rawBass = (bassSum / 2) / 255; 
+
+            // Eşik değeri (%70 altındaki seslerde kart sabit kalır)
+            var threshold = 0.70;
+            var intensity = 0;
+
+            if (rawBass > threshold) {
+                var normalized = (rawBass - threshold) / (1 - threshold);
+                // Üstel artış ile ani patlama hissi
+                intensity = Math.pow(normalized, 3);
+            }
+
+            // Titreşimi hafif tutmaya devam ediyoruz (okunabilirlik için max 4.5px)
+            var maxShake = 4.5; 
+            offsetX = (Math.random() - 0.5) * maxShake * intensity;
+            offsetY = (Math.random() - 0.5) * maxShake * intensity;
+            
+            // Bass anında kartın büyüme miktarını artırdık (Max %22 büyüme)
+            scale = 1 + (intensity * 0.22);
+        }
+
+        if(cEl) {
+            cEl.style.transform = "translate3d(" + offsetX + "px, " + offsetY + "px, 0px) scale(" + scale + ") rotateX(" + cx + "deg) rotateY(" + cy + "deg)";
+            
+            // Büyüme anında gölgeyi belirgin şekilde yayarak 3D öne sıçrama efektini destekliyoruz
+            var shadowOp = 0.4 + ((scale - 1) * 3.5); 
+            var shadowBlur = 60 + ((scale - 1) * 120);
+            cEl.style.boxShadow = "0 12px " + shadowBlur + "px rgba(0,0,0," + shadowOp + ")";
+        }
+
+        requestAnimationFrame(renderLoop);
+    }
+    renderLoop();
+
+    document.onmousemove = function(e) {
+        var w = window.innerWidth / 2;
+        var h = window.innerHeight / 2;
+        var x = (e.clientX - w) / w;
+        var y = (e.clientY - h) / h;
+        
+        var d = Math.sqrt(x*x + y*y);
+        var lim = 4 + (8 * Math.max(0, 1 - (d * 0.6)));
+        
+        tx = -y * lim;
+        ty = x * lim;
+    };
+
+    // Discord Lanyard
+    var dID = document.querySelector('.wrap').getAttribute('data-discord-id');
+    if(dID) {
+        var sock = new WebSocket('wss://api.lanyard.rest/socket');
+        sock.onopen = function() {
+            sock.send(JSON.stringify({ op: 2, d: { subscribe_to_id: dID } }));
+        };
+        sock.onmessage = function(e) {
+            var j = JSON.parse(e.data);
+            if(j.t === 'INIT_STATE' || j.t === 'PRESENCE_UPDATE') {
+                doUpdate(j.d);
+            }
+        };
+    }
+
+    function doUpdate(d) {
+        var dot = document.getElementById('dot');
+        var img = document.getElementById('stat_img');
+        var t1 = document.getElementById('txt1');
+        var t2 = document.getElementById('txt2');
+        
+        var cols = { online:'#43b581', idle:'#faa61a', dnd:'#f04747', offline:'#747f8d' };
+        var statColor = cols[d.discord_status] || cols.offline;
+        
+        if(dot) dot.style.backgroundColor = statColor;
+
+        if(d.spotify) {
+            img.src = d.spotify.album_art_url;
+            t1.innerHTML = '<i class="fa-brands fa-spotify" style="color:#1DB954;"></i><span style="color:#1DB954;font-weight:600">Spotify</span>';
+            var art = d.spotify.artist.replace(/;/g, ",");
+            t2.innerHTML = '<div class="sp-box"><div class="tr-name">' + d.spotify.song + '</div><div class="ar-name">' + art + '</div></div>';
+        } else {
+            if(d.discord_user) {
+                img.src = "https://cdn.discordapp.com/avatars/" + dID + "/" + d.discord_user.avatar + ".png?size=128";
+            }
+            
+            var statusNames = {
+                'online': 'Online', 
+                'idle': 'Idle', 
+                'dnd': 'Do Not Disturb', 
+                'offline': 'Offline'
+            };
+            var sText = statusNames[d.discord_status] || 'Offline';
+            t1.innerHTML = '<span style="color:' + statColor + '; font-weight:600;">' + sText + '</span>';
+
+            t2.innerHTML = '<div class="sp-box">' +
+                           '<div class="tr-name">eron4u</div>' +
+                           '<div class="ar-name">Çünkü ben ünlüyüm</div>' +
+                           '</div>';
+        }
+    }
+
+    var cBtn = document.getElementById("cp_disc");
+    var notif = document.getElementById("notif");
+    
+    if(cBtn) {
+        cBtn.onclick = function() {
+            navigator.clipboard.writeText("eron4u");
+            if(notif) {
+                notif.innerText = "Copied!";
+                notif.className = "toast show";
+                setTimeout(function(){ notif.className = "toast"; }, 1500);
+            }
+        };
+    }
+
+    var waB = document.getElementById('btn_wa');
+    var waP = document.getElementById('pop_wa');
+    var waD = document.getElementById('bg_blur');
+    
+    function closeWa() {
+        waP.style.display = 'none';
+        waD.style.display = 'none';
+    }
+    
+    function copyWa(n) {
+        navigator.clipboard.writeText(n);
+        closeWa();
+        if(notif) {
+            notif.innerText = "Copied!";
+            notif.className = "toast show";
+            setTimeout(function(){ notif.className = "toast"; }, 1500);
+        }
+    }
+
+    if(waB) {
+        waB.onclick = function() {
+            waP.style.display = 'block';
+            waD.style.display = 'block';
+        };
+    }
+    if(waD) waD.onclick = closeWa;
+    
+    var f1 = document.getElementById('f_tr');
+    var f2 = document.getElementById('f_uk');
+    
+    if(f1) f1.onclick = function() { copyWa('+90 541 150 54 84'); };
+    if(f2) f2.onclick = function() { copyWa('+44 7346 244942'); };
+
+  // Daktilo efekti
+  var words = ["eron4u", "eronforyou", "eron4you", "efe"];
+  var wordIndex = 0;
+  var charIndex = 1; 
+  var isDeleting = false;
+  var nickEl = document.querySelector('.nick');
+
+  nickEl.textContent = "e";
+
+  function typeEffect() {
+    var currentWord = words[wordIndex];
+    
+    if (isDeleting) {
+      nickEl.textContent = currentWord.substring(0, charIndex - 1);
+      charIndex--;
+    } else {
+      nickEl.textContent = currentWord.substring(0, charIndex + 1);
+      charIndex++;
+    }
+    
+    var typingSpeed = isDeleting ? 70 : 120; 
+    
+    if (!isDeleting && charIndex === currentWord.length) {
+      typingSpeed = 1500; 
+      isDeleting = true;
+    } 
+    else if (isDeleting && charIndex === 1) {
+      isDeleting = false;
+      wordIndex++;
+      
+      if (wordIndex >= words.length) {
+        wordIndex = 0; 
+      }
+      typingSpeed = 400; 
+    }
+    
+    setTimeout(typeEffect, typingSpeed);
+  }
+
+  typeEffect();
+  </script>
+
+</body>
+</html>
